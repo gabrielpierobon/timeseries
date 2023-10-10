@@ -1,0 +1,13 @@
+# Ignore these directories anywhere in the project
+.ipynb_checkpoints/
+__pycache__/
+
+# Ignore contents of these directories, but not the directories themselves
+logs/*
+mlruns/*
+outputs/*
+plots/*
+
+# Ignore these specific files/directories at the root level
+/venv/
+/.env

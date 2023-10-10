@@ -1,0 +1,26 @@
+# Use the official Jupyter base notebook image as the base image
+FROM jupyter/base-notebook:latest
+
+# Switch to the root user to install system packages
+USER root
+
+# Update system packages and install git.
+RUN apt-get update && \
+    apt-get install -y git && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Copy the requirements.txt file from the host into the container at the specified path.
+COPY requirements.txt /requirements.txt
+
+# Upgrade pip to ensure that the latest version is used.
+RUN python -m pip install --upgrade pip
+
+# Install the Python dependencies listed in requirements.txt
+RUN pip install --no-cache-dir -r /requirements.txt
+
+# Install the jupyterlab-git extension and ensure JupyterLab version is below 4
+RUN pip install --upgrade "jupyterlab<4" jupyterlab-git
+
+# Change ownership of the /home/jovyan/work directory to jovyan user
+RUN chown -R jovyan:users /home/jovyan/work

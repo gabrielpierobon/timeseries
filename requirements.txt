@@ -1,0 +1,12 @@
+matplotlib
+tensorflow
+scikit-learn
+numpy
+keras
+datetime
+mlflow
+PyYAML
+apache-airflow
+apache-airflow-providers-papermill
+ipykernel
+jupyterlab-git

@@ -1,0 +1,121 @@
+Alright! Since you want to run both your solution and Airflow in Docker, and given that your project seems to be structured around Jupyter notebooks, I'm going to guide you through creating a Docker setup that includes both a Jupyter server and an Airflow server. Here's a step-by-step guide:
+
+1. **Docker Compose**: Instead of a single `Dockerfile`, we'll use Docker Compose, which allows you to define and run multi-container Docker applications. It's ideal for applications like yours that might require multiple services.
+
+2. **Create a `docker-compose.yml` File**:
+Create a `docker-compose.yml` file in your project root directory:
+
+```yaml
+version: '3'
+
+services:
+  jupyter:
+    image: jupyter/base-notebook:latest
+    volumes:
+      - .:/home/jovyan/work
+    ports:
+      - "8888:8888"
+    working_dir: /home/jovyan/work
+    command: start-notebook.sh --NotebookApp.token=''
+
+  postgres:
+     image: postgres:13
+     environment:
+       - POSTGRES_USER=airflow
+       - POSTGRES_PASSWORD=airflow
+       - POSTGRES_DB=airflow
+     volumes:
+       - pgdata:/var/lib/postgresql/data
+
+  airflow-webserver:
+    image: apache/airflow:2.2.2-python3.8
+    depends_on:
+      - postgres
+    environment:
+      - LOAD_EXAMPLES=False
+      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+    volumes:
+      - ./dags:/opt/airflow/dags
+    ports:
+      - "8080:8080"
+    command: webserver
+
+  airflow-scheduler:
+    image: apache/airflow:2.2.2-python3.8
+    depends_on:
+      - postgres
+    environment:
+      - LOAD_EXAMPLES=False
+      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+    volumes:
+      - ./dags:/opt/airflow/dags
+    command: scheduler
+  
+  mlflow:
+    image: mlflow-docker-example:latest
+    ports:
+      - "5000:5000"
+    environment:
+      - MLFLOW_BACKEND_STORE_URI=postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+      - MLFLOW_S3_ENDPOINT_URL=http://localhost:9000
+      - AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE
+      - AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+    command:
+      mlflow server 
+      --host 0.0.0.0 
+      --backend-store-uri $MLFLOW_BACKEND_STORE_URI 
+      --default-artifact-root s3://mlflow/ 
+      --port 5000
+
+volumes:
+  pgdata:
+
+
+```
+
+3. **Run Docker Compose**:
+
+To start both the Jupyter server and Airflow:
+
+```bash
+docker-compose up
+```
+
+After running this command, both the Jupyter server and the Airflow web server should start. You can access:
+
+- Jupyter at: http://localhost:8888
+- Airflow at: http://localhost:8080
+
+4. **Access the Jupyter Notebook**:
+
+When you access Jupyter, you'll see your project files under the `work` directory.
+
+5. **Airflow Initialization**:
+
+Airflow needs to be initialized the first time you run it. To do this, execute the following commands:
+
+```bash
+docker-compose run airflow-webserver airflow db init
+docker-compose run airflow-webserver airflow users create --username admin --password admin --firstname First --lastname Last --role Admin --email admin@example.com
+```
+
+This initializes the Airflow database and creates an admin user.
+
+6. **Customizing the Setup**:
+
+You might want to customize this setup based on your specific needs. For example:
+
+- Installing additional Python packages: You might need to replace the Jupyter and Airflow images with custom Dockerfiles that install additional packages.
+- Airflow configurations: The basic setup here uses the default Airflow configuration. You might need to mount a custom `airflow.cfg` file or set additional environment variables.
+
+7. **Shutdown and Cleanup**:
+
+To stop the services:
+
+```bash
+docker-compose down
+```
+
+This approach gives you a Dockerized environment for both your Jupyter-based solution and Airflow. It ensures that wherever you or your team run this, it will work in the same way, making collaboration and deployment much easier.

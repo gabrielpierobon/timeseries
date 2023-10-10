@@ -1,0 +1,18 @@
+model_name: 'inflation_leliqs'
+model_artifact_name: 'TSMixerModel'
+experiment_version: '1.91'
+production_version: '1.2'
+features:
+  - "inflacion"
+  - "leliqs"
+csv_paths:
+  - "datasets/inflacion.csv"
+  - "datasets/leliqs.csv"
+register_experiment: False
+register_model: False
+train_size: 0.8
+epochs: 50
+batch_size: 8
+patience: 5
+look_back: 10
+stage: "Production"  # or "Staging"

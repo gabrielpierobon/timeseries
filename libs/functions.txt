@@ -1,0 +1,45 @@
+Set of Python functions for working with time series data, building and training a neural network model, and performing various tasks such as data preprocessing, backtesting, and forecasting. These functions are designed for time series forecasting tasks using a TSMixer-inspired model.
+
+Here's a summary of the key functions and their purposes:
+
+1. `load_and_preprocess_data`: Loads and preprocesses time series data, including handling missing values, resampling, and converting the index to datetime format.
+
+2. `plot_loaded_data`: Plots the loaded time series data.
+
+3. `build_tsmixer_model`: Defines a TSMixer-inspired neural network model for time series forecasting.
+
+4. `train_tsmixer_model`: Trains the TSMixer-inspired model with options for early stopping.
+
+5. `generate_dataset`: Generates input-output pairs for supervised learning from time series data.
+
+6. `time_based_split`: Splits time series data into training and test sets based on a specified time point.
+
+7. `scale_data`: Scales the data using Min-Max scaling and returns the scalers for inverse transformation.
+
+8. `inverse_transform_array`: Inverse transforms a scaled array back to its original scale using the provided scalers.
+
+9. `train_test_time_based_split`: Splits data into training and test sets for time-based evaluation.
+
+10. `backtest_model`: Backtests the trained model, making sequential predictions and evaluating performance.
+
+11. `predict_test_set`: Predicts values on a test set and visualizes the predictions.
+
+12. `forecast_data`: Generates future forecasts using the trained model.
+
+13. `mean_absolute_percentage_error`: Calculates the Mean Absolute Percentage Error (MAPE) for evaluation.
+
+14. `evaluate_test_set`: Evaluates the performance of the model on the test set using MAE, RMSE, and MAPE.
+
+15. `plot_test_set_predictions_with_history`: Plots test set predictions alongside the training data (history).
+
+16. `plot_future_forecast_with_history`: Plots the history and future forecast of a DataFrame.
+
+17. `log_experiment_to_mlflow`: Logs an experiment to MLflow, including the model, parameters, metrics, and artifacts.
+
+18. `load_mlflow_experimental_model`: Loads a model from an MLflow experiment using the run ID and artifact name.
+
+19. `load_mlflow_staged_model`: Loads a model from MLflow that is in a specific stage (e.g., Staging or Production).
+
+These functions provide a comprehensive set of tools for working with time series data, building and training neural network models, and evaluating model performance. 
+
+You can use these functions as building blocks for your time series forecasting projects. 
