@@ -16,12 +16,12 @@ with DAG('run_notebook',
          description='Run TSMixerFull.ipynb notebook',
          schedule_interval=timedelta(days=1),  # Set your own schedule here
          start_date=datetime(2023, 10, 7),
-         template_searchpath='/home/jovyan/work/include',
+         template_searchpath='/home/jovyan/work',
          catchup=False) as dag:
 
     run_notebook_task = PapermillOperator(
         task_id='run_notebook',
-        input_nb='include/TSMixerFull.ipynb',
-        output_nb='outputs/runs/TSMixerFull_output_{execution_date}.ipynb',
-        parameters={"execution_date": "{{ ds }}"},  # Pass parameters to your notebook here
+        input_nb='/home/jovyan/work/TSMixerFull.ipynb',  # Updated path
+        output_nb='/home/jovyan/work/outputs/runs/TSMixerFull_output_{execution_date}.ipynb',  # Updated path
+        parameters={"execution_date": "{{ ds }}"}  # Pass parameters to your notebook here
     )

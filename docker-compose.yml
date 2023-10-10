@@ -1,3 +1,5 @@
+# docker-compose.yml
+
 version: '3'
 
 services:
@@ -23,8 +25,10 @@ services:
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
       - AIRFLOW__WEBSERVER__SECRET_KEY=abcd1234efgh5678
       - JUPYTER_DATA_PATH=/home/jovyan/work
+      - AIRFLOW__CORE__DAGS_FOLDER=/home/jovyan/work/dags  # Set the DAG folder location here
+      - AIRFLOW__CORE__BASE_LOG_FOLDER=/home/jovyan/work/logs  # Set the log folder location here
     volumes:
-      - /home/jovyan/work:/home/jovyan/work
+      - .:/home/jovyan/work
     ports:
       - "8080:8080"
     command: webserver
@@ -42,8 +46,10 @@ services:
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
       - AIRFLOW__WEBSERVER__SECRET_KEY=abcd1234efgh5678
       - JUPYTER_DATA_PATH=/home/jovyan/work
+      - AIRFLOW__CORE__DAGS_FOLDER=/home/jovyan/work/dags  # Set the DAG folder location here
+      - AIRFLOW__CORE__BASE_LOG_FOLDER=/home/jovyan/work/logs  # Set the log folder location here
     volumes:
-      - /home/jovyan/work:/home/jovyan/work
+      - .:/home/jovyan/work
     command: scheduler
     depends_on:
       - postgres
@@ -62,7 +68,7 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - /home/jovyan/work:/home/jovyan/work
+      - .:/home/jovyan/work  # This line maps the current directory on the host to /home/jovyan/work in the container
     command: ["mlflow", "server", "--backend-store-uri", "/home/jovyan/work/mlruns", "--default-artifact-root", "/home/jovyan/work/mlruns", "--host", "0.0.0.0", "--port", "5000"]
 
 
