@@ -1,5 +1,7 @@
+# Dockerfile.airlfow
+
 # Use the updated official Airflow image as a parent image
-FROM apache/airflow:2.7.1-python3.8
+FROM apache/airflow:2.7.1-python3.9
 
 # Install system-level dependencies required for lxml
 USER root
@@ -7,6 +9,20 @@ RUN apt-get update -y && \
     apt-get install -y libxml2-dev libxslt-dev && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
+
+# Add 'airflow' user to 'users' group if it exists; create and add if it doesn't
+RUN getent group users || groupadd users && \
+    usermod -a -G users airflow
+
+# Remove the following line as it's not necessary
+# RUN chown -R :users /home/jovyan/work
+
+# Create a symbolic link to libs from /opt/airflow
+RUN ln -s /home/jovyan/work/libs /opt/airflow/libs && \
+    ln -s /home/jovyan/work/config /opt/airflow/config && \
+    ln -s /home/jovyan/work/datasets /opt/airflow/datasets && \
+    ln -s /home/jovyan/work/mlruns /opt/airflow/mlruns && \
+    ln -s /home/jovyan/work/plots /opt/airflow/plots
 
 # Switch back to airflow user
 USER airflow

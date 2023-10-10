@@ -1,6 +1,15 @@
 docker-compose build --no-cache
 docker-compose run airflow-webserver airflow db init
+docker-compose run airflow-webserver airflow users create --username admin --password admin --firstname First --lastname Last --role Admin --email admin@example.com
+docker-compose run airflow-webserver airflow users create --username admin --password admin --firstname First --lastname Last --role Admin --email admin@example.com
 
 docker-compose down
 docker-compose up
 docker-compose up -d
+
+
+
+
+git remote add origin https://github.com/gabrielpierobon/timeseries.git
+git push -u origin master
+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
