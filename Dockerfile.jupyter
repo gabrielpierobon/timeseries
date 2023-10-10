@@ -1,3 +1,5 @@
+# Dockerfile.jupyter
+
 # Use the official Jupyter base notebook image as the base image
 FROM jupyter/base-notebook:latest
 
