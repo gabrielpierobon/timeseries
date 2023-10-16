@@ -14,9 +14,6 @@ RUN apt-get update -y && \
 RUN getent group users || groupadd users && \
     usermod -a -G users airflow
 
-# Remove the following line as it's not necessary
-# RUN chown -R :users /home/jovyan/work
-
 # Create a symbolic link to libs from /opt/airflow
 RUN ln -s /home/jovyan/work/libs /opt/airflow/libs && \
     ln -s /home/jovyan/work/config /opt/airflow/config && \
