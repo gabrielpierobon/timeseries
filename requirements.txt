@@ -188,3 +188,6 @@ zipp==3.17.0
 zope.interface==6.1
 ipykernel
 jupyterlab-git
+psycopg2-binary
+sqlalchemy
+boto3
