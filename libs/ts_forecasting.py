@@ -66,7 +66,7 @@ def plot_loaded_data(data, title, y_label):
     plt.show()
 
 # Define the TSMixer-inspired model
-def build_tsmixer_model(input_shape, num_features):
+def build_tsmixer_model(input_shape, num_features, pre_trained_weights=None):
     # Input layer
     input_layer = Input(shape=input_shape)
 
@@ -82,12 +82,17 @@ def build_tsmixer_model(input_shape, num_features):
 
     # Construct the model
     model = Model(inputs=input_layer, outputs=output_layer)
+    
+    # Option to load pre-trained weights
+    if pre_trained_weights:
+        model.set_weights(pre_trained_weights)
+        
     return model
 
 # Train the TSMixer-inspired model
 from keras.callbacks import EarlyStopping
 
-def train_tsmixer_model(model, X_train, Y_train, X_test, Y_test, epochs=20, batch_size=8, patience=5):
+def train_tsmixer_model(model, X_train, Y_train, X_test, Y_test, epochs=20, batch_size=8, patience=5, pre_trained_weights=None):
     """
     Train a TimeSeriesMixer model.
 
@@ -100,6 +105,7 @@ def train_tsmixer_model(model, X_train, Y_train, X_test, Y_test, epochs=20, batc
     - epochs (int, optional): Number of epochs for training. Default is 20.
     - batch_size (int, optional): Batch size for training. Default is 8.
     - patience (int, optional): Number of epochs with no improvement after which training will be stopped. Default is 5.
+    - pre_trained_weights: weights from pre-trained model
 
     Returns:
     - history: Training history object containing training and validation loss.
@@ -113,6 +119,9 @@ def train_tsmixer_model(model, X_train, Y_train, X_test, Y_test, epochs=20, batc
         restore_best_weights=True
     )
 
+    if pre_trained_weights:
+        model.set_weights(pre_trained_weights)
+    
     try:
         history = model.fit(
             X_train, Y_train,
@@ -292,18 +301,22 @@ def predict_test_set(model, X_test, Y_test, data_scalers, features):
     Y_test_original = inverse_transform_array(Y_test, data_scalers)
     predictions_original = inverse_transform_array(predictions, data_scalers)
 
-    # Create subplots
-    fig, axes = plt.subplots(nrows=len(features), ncols=1, figsize=(15, 10))
+    try:
+        # Create subplots
+        fig, axes = plt.subplots(nrows=len(features), ncols=1, figsize=(15, 10))
 
-    for i, feature in enumerate(features):
-        axes[i].plot(Y_test_original[:, i], label=f'Real {feature}', color='blue' if i==0 else 'green')
-        axes[i].plot(predictions_original[:, i], label=f'Predicted {feature}', alpha=0.7, color='lightblue' if i==0 else 'lightgreen')
-        axes[i].set_title(f'Real vs Predicted - {feature}')
-        axes[i].legend()
+        for i, feature in enumerate(features):
+            axes[i].plot(Y_test_original[:, i], label=f'Real {feature}', color='blue' if i==0 else 'green')
+            axes[i].plot(predictions_original[:, i], label=f'Predicted {feature}', alpha=0.7, color='lightblue' if i==0 else 'lightgreen')
+            axes[i].set_title(f'Real vs Predicted - {feature}')
+            axes[i].legend()
 
-    # Display the plots
-    plt.tight_layout()
-    plt.show()
+        # Display the plots
+        plt.tight_layout()
+        plt.show()
+    
+    except:
+        pass
 
     return Y_test_original, predictions_original, predictions
 
@@ -547,3 +560,26 @@ def load_mlflow_staged_model(model_name, version, stage):
     model_uri = f"models:/{model_name}_v{version}/{stage}"
     model = mlflow.pyfunc.load_model(model_uri)
     return model
+
+def get_weights(run_id, model_artifact_name):
+    """
+    Load a model using a specified run ID and artifact name, and return its weights.
+
+    Parameters:
+    - run_id (str): The MLflow run ID of the experiment.
+    - model_artifact_name (str): The name of the model artifact in MLflow.
+    
+    Returns:
+    - numpy array: The weights of the loaded model.
+    """
+
+    # Assuming the function `load_mlflow_experimental_model` is already defined
+    tsmixer_model = load_mlflow_experimental_model(run_id, model_artifact_name)
+    
+    # Retrieve the model's weights
+    weights = tsmixer_model.get_weights()
+    
+    # Print or log the model (optional)
+    print(tsmixer_model)
+    
+    return weights

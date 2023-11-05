@@ -1,13 +1,19 @@
-model_name: 'inflation_leliqs'
-model_artifact_name: 'TSMixerModel'
-experiment_version: '1.91'
-production_version: '1.2'
+model_name: 'dummy_data'
+model_artifact_name: 'TSMixerModel3'
+experiment_version: '1.1'
+production_version: '1.1'
 features:
-  - "inflacion"
-  - "leliqs"
+  - "linear"
+  - "exponential"
+  - "sinusoidal"
+  # - "short"
+  # - "short2"
 csv_paths:
-  - "datasets/inflacion.csv"
-  - "datasets/leliqs.csv"
+  - "datasets/dummy_linear_distinct.csv"
+  - "datasets/dummy_exponential_distinct.csv"
+  - "datasets/dummy_sinusoidal_distinct.csv"
+  # - "datasets/dummy_zero_series.csv"
+  # - "datasets/dummy_zero_series2.csv"
 register_experiment: False
 register_model: False
 train_size: 0.8

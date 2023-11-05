@@ -7,6 +7,12 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.jupyter
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=airflow
+      - POSTGRES_USER=airflow
+      - POSTGRES_PASSWORD=airflow
     volumes:
       - .:/home/jovyan/work
     ports:
@@ -27,11 +33,16 @@ services:
       - JUPYTER_DATA_PATH=/home/jovyan/work
       - AIRFLOW__CORE__DAGS_FOLDER=/home/jovyan/work/dags  # Set the DAG folder location here
       - AIRFLOW__CORE__BASE_LOG_FOLDER=/home/jovyan/work/logs  # Set the log folder location here
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=airflow
+      - POSTGRES_USER=airflow
+      - POSTGRES_PASSWORD=airflow
     volumes:
       - .:/home/jovyan/work
+    command: webserver
     ports:
       - "8080:8080"
-    command: webserver
     depends_on:
       - postgres
 
@@ -48,9 +59,35 @@ services:
       - JUPYTER_DATA_PATH=/home/jovyan/work
       - AIRFLOW__CORE__DAGS_FOLDER=/home/jovyan/work/dags  # Set the DAG folder location here
       - AIRFLOW__CORE__BASE_LOG_FOLDER=/home/jovyan/work/logs  # Set the log folder location here
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=airflow
+      - POSTGRES_USER=airflow
+      - POSTGRES_PASSWORD=airflow
     volumes:
       - .:/home/jovyan/work
     command: scheduler
+    depends_on:
+      - postgres
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: 'admin@example.com'  # Set your email
+      PGADMIN_DEFAULT_PASSWORD: 'admin'          # Set a strong password
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      - postgres
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
     depends_on:
       - postgres
 
@@ -71,13 +108,37 @@ services:
       - .:/home/jovyan/work  # This line maps the current directory on the host to /home/jovyan/work in the container
     command: ["mlflow", "server", "--backend-store-uri", "/home/jovyan/work/mlruns", "--default-artifact-root", "/home/jovyan/work/mlruns", "--host", "0.0.0.0", "--port", "5000"]
 
+  minio:
+    image: minio/minio
+    volumes:
+      - minio_data:/data
+    ports:
+      - "9001:9000"  # Expose port 9001 on host and map it to 9000 in the container
+      - "9091:9090"  # Add this line if you want to expose the MinIO Console
+    command: server /data --console-address ":9090"  # Specify console address if you're exposing it
+    environment:
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: minio123
+
+  flaskapp:
+    build: ./app
+    ports:
+      - "5001:5001" # Expose the Flask app on port 5001 externally
+    volumes:
+      - ./app:/usr/src/app
+    depends_on:
+      - postgres
+      - airflow-webserver
+      - jupyter
+      - mlflow
+      - minio
+    environment:
+      - FLASK_DEBUG=1
+      - FLASK_APP=app.py
 
 volumes:
   postgres_data:
-  logs:
-  config:
-  datasets:
-  libs:
+  pgadmin_data:
+  grafana_data:
   mlruns:
-  outputs:
-  plots:
+  minio_data:

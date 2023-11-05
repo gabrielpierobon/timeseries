@@ -1,0 +1,36 @@
+body, html {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.services-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px; /* Adjust the space between logos, increased due to larger size */
+}
+
+.service-link {
+    display: block;
+    width: 300px; /* Double the previous width */
+    height: 300px; /* Double the previous height */
+    overflow: hidden;
+    border-radius: 10px; /* Adjusted for aesthetics */
+}
+
+.service {
+    width: 100%;
+    height: 100%;
+    background-size: contain; /* Changed to 'contain' to make sure the logo fits within the square */
+    background-repeat: no-repeat; /* To prevent the image from repeating */
+    background-position: center;
+    transition: transform 0.3s ease;
+}
+
+.service:hover {
+    transform: scale(1.1); /* Slightly reduced the scale effect from 1.05 to 1.1 */
+}

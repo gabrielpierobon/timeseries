@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Service Dashboard</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="services-container">
+        {% for service_name, service_url in services.items() %}
+            <a href="{{ service_url }}" target="_blank" class="service-link">
+                <div class="service" style="background-image: url({{ url_for('static', filename=service_name + '.png') }});">
+                </div>
+            </a>
+        {% endfor %}
+    </div>
+</body>
+</html>
