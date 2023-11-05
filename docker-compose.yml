@@ -120,6 +120,22 @@ services:
       MINIO_ROOT_USER: minio
       MINIO_ROOT_PASSWORD: minio123
 
+  flaskapp:
+    build: ./app
+    ports:
+      - "5001:5001" # Expose the Flask app on port 5001 externally
+    volumes:
+      - ./app:/usr/src/app
+    depends_on:
+      - postgres
+      - airflow-webserver
+      - jupyter
+      - mlflow
+      - minio
+    environment:
+      - FLASK_DEBUG=1
+      - FLASK_APP=app.py
+
 volumes:
   postgres_data:
   pgadmin_data:
